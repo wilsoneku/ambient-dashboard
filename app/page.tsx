@@ -1,65 +1,73 @@
-import Image from "next/image";
+import { Clock } from '@/app/(components)/clock/clock';
+import { TodoInterface } from '@/app/(components)/todo/todo-interface';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { fetchTasks } from '@/lib/actions/todo-actions';
+import { AudioPlayer } from '@/app/(components)/ambiance/audio-player';
+import { GifPlayer } from '@/app/(components)/ambiance/gif-player';
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+export default async function Home() {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const userId = session?.user.id ?? null;
+    const tasks = userId ? await fetchTasks(userId) : [];
+
+    const defaultTrack = {
+        id: 'default',
+        url: 'https://www.youtube.com/watch?v=f_B_WMOkl_g',
+        label: 'Winter Jazz'
+    }
+
+    return (
+        <div className="flex min-h-screen items-stretch justify-center bg-app font-sans text-app
+                        px-4 md:px-12 lg:px-20">
+            <main className="flex w-full flex-col">
+                {/* Clock */}
+                <section className="flex items-center justify-center pb-4 mt-3">
+                    <Clock
+                        timeZone="America/Los_Angeles"
+                        use24Hour={false}
+                        showSeconds={false}
+                        className="text-app w-full max-w-3xl"
+                        timeClassName="w-full text-center text-5xl md:text-6xl lg:text-7xl font-mono tracking-[0.2em] text-app"
+                        dateClassName="mt-3 text-xs md:text-sm tracking-[0.3em] uppercase text-app/60 text-center w-full"
+                    />
+                </section>
+
+                {/* Middle content grows but stays within viewport */}
+                <section className="py-2 flex flex-1 flex-col items-center justify-center overflow-hidden">
+                    {userId && (
+                        <TodoInterface
+                            userId={userId}
+                            initialTasks={tasks}
+                            texts={{ heading: 'Todo List' }}
+                            className="flex flex-col w-full h-full max-w-xl
+                                       border border-accent-soft rounded-md text-app"
+                        />
+                    )}
+                </section>
+
+                {/* Bottom ambiance bar pinned to viewport bottom */}
+                <section className="mb-3 flex w-full items-center">
+                    {/* Left spacer (for symmetry / future controls) */}
+                    <div className="flex-1 h-24" />
+
+                    {/* Center GIF */}
+                    <div className="flex flex-1 items-center justify-center">
+                        <GifPlayer className="h-48 w-48 rounded-xl" />
+                    </div>
+
+                    {/* Right: audio player stretches */}
+                    <div className="flex-1 border border-accent-soft rounded-xl px-4 py-3">
+                        <AudioPlayer
+                            defaultTrack={defaultTrack}
+                            className="w-full max-w-3xl rounded-xl px-4 py-3 text-app"
+                        />
+                    </div>
+                </section>
+            </main>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    );
 }

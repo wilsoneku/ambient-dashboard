@@ -1,15 +1,95 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* default campfire theme */
+  --bg: #222032;
+  --text: #ededf4;            /* warm beige */
+  --text-soft: rgba(84, 84, 90, 0.8);       /* softer text color */
+  --accent: #c4f0da;          /* cool mint highlight */
+  --accent-soft: #8ac6a430;   /* minty glow */
+  --card: #262437;            /* subtle lift over bg */
+
+  --background: #222032;
+  --foreground: #cfc6bb;
 }
 
+/* Campfire I */
+html[data-theme='pixel-campfire-1'] {
+  --bg: #13161f;
+  --text: rgba(241, 230, 214, 1);           /* warmer parchment beige */
+  --text-soft: rgba(84, 84, 90, 0.8);       /* softer text color */
+  --accent: #ffb86a;          /* ember orange, slightly brighter */
+  --accent-soft: rgba(50, 52, 60, .5);   /* soft ember glow */
+  --card: #191d2a;            /* a touch lighter than bg */
+}
+
+/* Campfire II */
+html[data-theme='pixel-campfire-2'] {
+  --bg: #050508;
+  --text: rgba(241, 230, 214, 1);           /* warmer parchment beige */
+  --text-soft: rgba(84, 84, 90, 0.8);       /* softer text color */
+  --accent: #ff8f3d;          /* vivid campfire orange */
+  --accent-soft: rgba(103, 92, 86, 0.5);   /* stronger warm halo */
+  --card: #202020;            /* slightly lifted panel */
+}
+
+@layer utilities {
+  .bg-app {
+    background-color: var(--bg);
+  }
+  .text-app {
+    color: var(--text);
+  }
+  .text-soft {
+    color: var(--text-soft);
+  }
+  .border-accent {
+    border-color: var(--accent);
+  }
+  .border-accent-soft {
+    border-color: var(--accent-soft);
+  }
+  .bg-accent-soft {
+    background-color: var(--accent-soft);
+  }
+  .bg-card {
+    background-color: var(--card);
+  }
+  .text-accent {
+    color: var(--accent);
+  }
+  .hover\:text-accent:hover {
+    color: var(--accent);
+  }
+  .hover\:bg-card:hover {
+    background-color: var(--card);
+  }
+  .hover\:accent-soft:hover {
+    color: var(--accent-soft);
+  }
+
+  @keyframes bubble-up {
+    0% {
+      transform: translateY(6px) scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-bubble-up {
+    animation: bubble-up 0.18s ease-out both;
+    transform-origin: bottom center;
+  }
+}
+
+
 @theme inline {
+  --color-campfire1: #222033;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +103,39 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/*Audio Slider*/
+/* Make the slider's clickable area tall, but keep the track thin */
+.audio-slider {
+  height: 24px;                /* big hitbox */
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+.audio-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--text-soft);
+}
+.audio-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  margin-top: -6px;            /* center thumb on thin track */
+  border-radius: 9999px;
+  background: var(--accent);
+}
+
+/* Firefox */
+.audio-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--text-soft);
+}
+.audio-slider::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: var(--accent);
+  border: none;
 }
